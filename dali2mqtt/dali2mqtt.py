@@ -251,17 +251,10 @@ def on_message_reinitialize_lamps_cmd(mqtt_client, data_object, msg):
 
 
 def get_lamp_object(data_object, light):
-    """Retrieve lamp object from data object."""
-    if "group_" in light:
-        """Check if the comand is for a dali group"""
-        group = int(re.search(r"group_(\d+)", light).group(1))
-        lamp_object = data_object["all_lamps"][group]
-    else:
-        """The command is for a single lamp"""
-        if light not in data_object["all_lamps"]:
-            raise KeyError
-        lamp_object = data_object["all_lamps"][light]
-    return lamp_object
+    """Retrieve lamp/group object from data object."""
+    if light not in data_object["all_lamps"]:
+        raise KeyError
+    return data_object["all_lamps"][light]
 
 
 def on_message_brightness_cmd(mqtt_client, data_object, msg):
