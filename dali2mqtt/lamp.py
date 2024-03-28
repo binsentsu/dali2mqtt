@@ -108,8 +108,9 @@ class Lamp:
 
     def __str__(self):
         """Serialize lamp information."""
+        addr = self.short_address.address if hasattr(self.short_address,"address") else self.short_address
         return (
-            f"{self.device_name} - address: {self.short_address.address}, "
+            f"{self.device_name} - address: {addr}, "
             f"actual brightness level: {self.level} (minimum: {self.min_level}, "
             f"max: {self.max_level}, physical minimum: {self.min_physical_level})"
         )

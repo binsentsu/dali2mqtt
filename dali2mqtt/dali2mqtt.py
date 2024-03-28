@@ -149,38 +149,39 @@ def initialize_lamps(data_object, client):
                 address,
             )
 
-            data_object["all_lamps"][name] = lamp_object
+            device_name = lamp_object.device_name
+            data_object["all_lamps"][device_name] = lamp_object
 
             mqtt_data = [
                 (
-                    HA_DISCOVERY_PREFIX.format(ha_prefix, name),
+                    HA_DISCOVERY_PREFIX.format(ha_prefix, device_name),
                     lamp_object.gen_ha_config(mqtt_base_topic),
                     True,
                 ),
                 (
-                    MQTT_BRIGHTNESS_STATE_TOPIC.format(mqtt_base_topic, name),
+                    MQTT_BRIGHTNESS_STATE_TOPIC.format(mqtt_base_topic, device_name),
                     lamp_object.level,
                     False,
                 ),
                 (
-                    MQTT_BRIGHTNESS_MAX_LEVEL_TOPIC.format(mqtt_base_topic, name),
+                    MQTT_BRIGHTNESS_MAX_LEVEL_TOPIC.format(mqtt_base_topic, device_name),
                     lamp_object.max_level,
                     True,
                 ),
                 (
-                    MQTT_BRIGHTNESS_MIN_LEVEL_TOPIC.format(mqtt_base_topic, name),
+                    MQTT_BRIGHTNESS_MIN_LEVEL_TOPIC.format(mqtt_base_topic, device_name),
                     lamp_object.min_level,
                     True,
                 ),
                 (
                     MQTT_BRIGHTNESS_PHYSICAL_MINIMUM_LEVEL_TOPIC.format(
-                        mqtt_base_topic, name
+                        mqtt_base_topic, device_name
                     ),
                     lamp_object.min_physical_level,
                     True,
                 ),
                 (
-                    MQTT_STATE_TOPIC.format(mqtt_base_topic, name),
+                    MQTT_STATE_TOPIC.format(mqtt_base_topic, device_name),
                     MQTT_PAYLOAD_ON if lamp_object.level > 0 else MQTT_PAYLOAD_OFF,
                     False,
                 ),
@@ -205,9 +206,10 @@ def initialize_lamps(data_object, client):
     for group in groups:
         logger.debug("Publishing group %d", group)
 
-        group_address = address.Group(int(group))
-
-        create_mqtt_lamp(group_address, f"group_{group}")
+        group_address = address.Group(int(group)) 
+        name = f"group_{group}"
+        name = devices_names_config.get_friendly_name(name)
+        create_mqtt_lamp(group_address, name)
 
     if devices_names_config.is_devices_file_empty():
         devices_names_config.save_devices_names_file(data_object["all_lamps"])
