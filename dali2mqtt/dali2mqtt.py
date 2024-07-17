@@ -310,8 +310,14 @@ def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
     ).group(1)
     try:
         lamp_object = get_lamp_object(data_object, light)
+        retrieve_actual_level(mqtt_client, data_object, lamp_object)
 
+    except KeyError:
+        logger.error("Lamp %s doesn't exists", light)
+        
+def retrieve_actual_level(mqtt_client, data_object, lamp_object):
         try:
+            light = lamp_object.device_name
             lamp_object.actual_level()
             logger.debug("Get light <%s> results in %d", light, lamp_object.level)
 
@@ -334,9 +340,7 @@ def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
                 lamp_object.min_level,
                 lamp_object.max_level,
                 err,
-            )
-    except KeyError:
-        logger.error("Lamp %s doesn't exists", light)
+            )    
 
 
 def on_message(mqtt_client, data_object, msg):  # pylint: disable=W0613
