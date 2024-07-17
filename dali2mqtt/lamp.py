@@ -94,11 +94,12 @@ class Lamp:
     @level.setter
     def level(self, value):
         """Commit level to ballast."""
-        if value != 0:
+        if isinstance(value, int) and value != 0:
             if value < self.min_level:
                 value = self.min_level
             elif value > self.max_level:
                 value = self.max_level
+                
         if isinstance(value, int):
             self.__level = value
             self.driver.send(gear.DAPC(self.short_address, self.level))
