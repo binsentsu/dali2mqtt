@@ -128,3 +128,8 @@ class Lamp:
         
     def is_group(self):
         return isinstance(self.short_address, address.Group)
+    
+    def add_associated_lamp(self, assoc_lamp_object):
+        if self.associated_lamps is None:
+            self.associated_lamps = [] 
+        self.associated_lamps.append(assoc_lamp_object)
