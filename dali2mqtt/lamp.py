@@ -99,13 +99,16 @@ class Lamp:
                 value = self.min_level
             elif value > self.max_level:
                 value = self.max_level
-                
+
         if isinstance(value, int):
             self.__level = value
-            self.driver.send(gear.DAPC(self.short_address, self.level))
-            logger.debug(
+        else:
+            self.__level = 0
+            
+        self.driver.send(gear.DAPC(self.short_address, self.level))
+        logger.debug(
             "Set lamp <%s> brightness level to %s", self.friendly_name, self.level
-            )
+        )
 
         
     def off(self):
