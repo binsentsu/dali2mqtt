@@ -295,6 +295,9 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
                 lamp_object.level,
                 retain=True,
             )
+            if lamp_object.associated_lamps:
+                for assoc_lamp in lamp_object.associated_lamps:
+                    retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
         except ValueError as err:
             logger.error(
                 "Can't convert <%s> to integer %d..%d: %s",
