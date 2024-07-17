@@ -92,10 +92,10 @@ def scan_groups(dali_driver, lamps):
         try:
             logging.debug("Search for groups for Lamp {}".format(lamp))
             group1 = dali_driver.send(
-                gear.QueryGroupsZeroToSeven(address.Short(lamp.short_address))
+                gear.QueryGroupsZeroToSeven(lamp.short_address)
             ).value.as_integer
             group2 = dali_driver.send(
-                gear.QueryGroupsEightToFifteen(address.Short(lamp.short_address))
+                gear.QueryGroupsEightToFifteen(lamp.short_address)
             ).value.as_integer
 
             #            logger.debug("Group 0-7: %d", group1)
