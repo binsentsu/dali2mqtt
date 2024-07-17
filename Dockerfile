@@ -3,7 +3,10 @@ FROM python:3.10.14-bookworm
 WORKDIR /app
 
 RUN apt-get update && apt-get install usbutils -y && pip install --upgrade pip 
-RUN git clone https://github.com/binsentsu/dali2mqtt && cd dali2mqtt && pip install -r requirements.txt
+
+COPY . /app/dali2mqtt
+
+RUN cd dali2mqtt && pip install -r requirements.txt
 
 WORKDIR /app/dali2mqtt
 
