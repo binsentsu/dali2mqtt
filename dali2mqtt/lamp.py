@@ -100,10 +100,11 @@ class Lamp:
      #       elif value > self.max_level:
      #           value = self.max_level
         self.__level = value
-        self.driver.send(gear.DAPC(self.short_address, self.level))
         logger.debug(
-            "Set lamp <%s> brightness level to %s", self.friendly_name, self.level
+            "Set lamp <%s> brightness level to %s", self.friendly_name, self.__level
         )
+        self.driver.send(gear.DAPC(self.short_address, self.__level))
+        
 
     def off(self):
         """Turn off ballast."""
