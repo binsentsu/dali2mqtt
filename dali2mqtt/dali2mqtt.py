@@ -206,7 +206,7 @@ def initialize_lamps(data_object, client):
         ))
 
     groups = scan_groups(driver, lamp_objects)
-    for group in groups:
+    for group,lamps in groups.items():
         logger.debug("Publishing group %d", group)
 
         group_address = address.Group(int(group)) 

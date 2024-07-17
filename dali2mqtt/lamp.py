@@ -3,6 +3,7 @@ import json
 import logging
 
 import dali.gear.general as gear
+import dali.address as address
 from dali2mqtt.consts import (
     ALL_SUPPORTED_LOG_LEVELS,
     LOG_FORMAT,
@@ -124,3 +125,6 @@ class Lamp:
             f"actual brightness level: {self.level} (minimum: {self.min_level}, "
             f"max: {self.max_level}, physical minimum: {self.min_physical_level})"
         )
+        
+    def is_group(self):
+        return isinstance(self.short_address, address.Group)
