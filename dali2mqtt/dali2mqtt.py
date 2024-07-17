@@ -118,7 +118,7 @@ def scan_groups(dali_driver, lamps):
                     lamp_groups.append(i + 8)
 
             logger.debug("Lamp %d is in groups %s", lamp.short_address.address, lamp_groups)
-            lamp.lamp_groups = lamp_groups
+            lamp.associated_lamps = lamp_groups
 
         except Exception as e:
             logger.warning("Can't get groups for lamp %s: %s", lamp, e)
@@ -212,7 +212,9 @@ def initialize_lamps(data_object, client):
         group_address = address.Group(int(group)) 
         name = f"group_{group}"
         name = devices_names_config.get_friendly_name(name)
-        create_mqtt_lamp(group_address, name)
+        group_object = create_mqtt_lamp(group_address, name)
+        group_object.associated_lamps = lamps
+
 
     if devices_names_config.is_devices_file_empty():
         devices_names_config.save_devices_names_file(data_object["all_lamps"])
