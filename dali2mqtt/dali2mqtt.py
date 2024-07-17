@@ -117,7 +117,7 @@ def scan_groups(dali_driver, lamps):
                     groups[i + 8].append(lamp)
                     lamp_groups.append(i + 8)
 
-            logger.debug("Lamp %d is in groups %s", lamp, lamp_groups)
+            logger.debug("Lamp %d is in groups %s", lamp.short_address.address, lamp_groups)
             lamp.lamp_groups = lamp_groups
 
         except Exception as e:
