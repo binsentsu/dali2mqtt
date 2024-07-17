@@ -243,6 +243,9 @@ def on_message_cmd(mqtt_client, data_object, msg):
                 MQTT_PAYLOAD_OFF,
                 retain=True,
             )
+            if lamp_object.associated_lamps:
+                for assoc_lamp in lamp_object.associated_lamps:
+                    retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
         except DALIError as err:
             logger.error("Failed to set light <%s> to OFF: %s", light, err)
         except KeyError:
