@@ -92,10 +92,10 @@ def scan_groups(dali_driver, lamps):
         try:
             logging.debug("Search for groups for Lamp {}".format(lamp))
             group1 = dali_driver.send(
-                gear.QueryGroupsZeroToSeven(address.Short(lamp))
+                gear.QueryGroupsZeroToSeven(address.Short(lamp.short_address))
             ).value.as_integer
             group2 = dali_driver.send(
-                gear.QueryGroupsEightToFifteen(address.Short(lamp))
+                gear.QueryGroupsEightToFifteen(address.Short(lamp.short_address))
             ).value.as_integer
 
             #            logger.debug("Group 0-7: %d", group1)
@@ -118,6 +118,7 @@ def scan_groups(dali_driver, lamps):
                     lamp_groups.append(i + 8)
 
             logger.debug("Lamp %d is in groups %s", lamp, lamp_groups)
+            lamp.lamp_groups = lamp_groups
 
         except Exception as e:
             logger.warning("Can't get groups for lamp %s: %s", lamp, e)
@@ -190,19 +191,21 @@ def initialize_lamps(data_object, client):
                 client.publish(topic, payload, retain)
 
             logger.info(lamp_object)
+            return lamp_object
 
         except DALIError as err:
             logger.error("While initializing <%s> @ %s: %s", name, address, err)
-
+    
+    lamp_objects = [] 
     for lamp in lamps:
         short_address = address.Short(lamp)
 
-        create_mqtt_lamp(
+        lamp_objects.append(create_mqtt_lamp(
             short_address,
             devices_names_config.get_friendly_name(short_address.address),
-        )
+        ))
 
-    groups = scan_groups(driver, lamps)
+    groups = scan_groups(driver, lamp_objects)
     for group in groups:
         logger.debug("Publishing group %d", group)
 

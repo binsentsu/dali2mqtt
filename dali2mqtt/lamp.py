@@ -36,6 +36,7 @@ class Lamp:
         self.driver = driver
         self.short_address = short_address
         self.friendly_name = friendly_name
+        self.lamp_groups = None
 
         self.device_name = slugify(friendly_name)
 
