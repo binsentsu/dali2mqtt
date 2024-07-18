@@ -249,12 +249,10 @@ def on_message_cmd(mqtt_client, data_object, msg):
             if lamp_object.associated_lamps:
                 for assoc_lamp in lamp_object.associated_lamps:
                     retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
-                    time.sleep(1)
                     if lamp_object.is_group():
                         if assoc_lamp.associated_lamps:
                             for nested_lamp in assoc_lamp.associated_lamps:
                                 retrieve_actual_level(mqtt_client, data_object, nested_lamp)
-                                time.sleep(1)
         except DALIError as err:
             logger.error("Failed to set light <%s> to OFF: %s", light, err)
         except KeyError:
@@ -304,12 +302,10 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
             if lamp_object.associated_lamps:
                 for assoc_lamp in lamp_object.associated_lamps:
                     retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
-                    time.sleep(1)
                     if lamp_object.is_group():
                         if assoc_lamp.associated_lamps:
                             for nested_lamp in assoc_lamp.associated_lamps:
                                 retrieve_actual_level(mqtt_client, data_object, nested_lamp)
-                                time.sleep(1)
         except ValueError as err:
             logger.error(
                 "Can't convert <%s> to integer %d..%d: %s",
