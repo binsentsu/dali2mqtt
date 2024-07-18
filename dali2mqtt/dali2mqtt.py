@@ -325,9 +325,10 @@ def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
         logger.error("Lamp %s doesn't exists", light)
         
 def update_associated_lamps(mqtt_client, data_object, lamp_object):
-    associated_lamp_update_executor.submit(execute_update_associated_lamps, mqtt_client, data_object, lamp_object)
-   # thread = Thread(target=execute_update_associated_lamps, args=(mqtt_client, data_object, lamp_object))
-  #  thread.start()  
+    if lamp_object.associated_lamps:
+        """Give 1 sec to complete the main action before evaluating the associations"""
+        time.sleep(1)
+        associated_lamp_update_executor.submit(execute_update_associated_lamps, mqtt_client, data_object, lamp_object)
                             
 def execute_update_associated_lamps(mqtt_client, data_object, lamp_object):
     if lamp_object.associated_lamps:
