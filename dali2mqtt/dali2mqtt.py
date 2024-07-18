@@ -5,6 +5,7 @@ import argparse
 import logging
 import random
 import re
+from threading import Thread
 import time
 import os
 
@@ -246,14 +247,7 @@ def on_message_cmd(mqtt_client, data_object, msg):
                 MQTT_PAYLOAD_OFF,
                 retain=True,
             )
-            if lamp_object.associated_lamps:
-                for assoc_lamp in lamp_object.associated_lamps:
-                    retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
-                    if lamp_object.is_group():
-                        if assoc_lamp.associated_lamps:
-                            for nested_lamp in assoc_lamp.associated_lamps:
-                                if nested_lamp.device_name != lamp_object.device_name:
-                                    retrieve_actual_level(mqtt_client, data_object, nested_lamp)
+            update_associated_lamps(mqtt_client, data_object, lamp_object)
         except DALIError as err:
             logger.error("Failed to set light <%s> to OFF: %s", light, err)
         except KeyError:
@@ -300,14 +294,7 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
                 lamp_object.level,
                 retain=True,
             )
-            if lamp_object.associated_lamps:
-                for assoc_lamp in lamp_object.associated_lamps:
-                    retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
-                    if lamp_object.is_group():
-                        if assoc_lamp.associated_lamps:
-                            for nested_lamp in assoc_lamp.associated_lamps:
-                                if nested_lamp.device_name != lamp_object.device_name:
-                                    retrieve_actual_level(mqtt_client, data_object, nested_lamp)
+            update_associated_lamps(mqtt_client, data_object, lamp_object)
         except ValueError as err:
             logger.error(
                 "Can't convert <%s> to integer %d..%d: %s",
@@ -333,6 +320,20 @@ def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
 
     except KeyError:
         logger.error("Lamp %s doesn't exists", light)
+        
+def update_associated_lamps(mqtt_client, data_object, lamp_object):
+    thread = Thread(target=execute_update_associated_lamps, args=(mqtt_client, data_object, lamp_object))
+    thread.start()  
+                            
+def execute_update_associated_lamps(mqtt_client, data_object, lamp_object):
+    if lamp_object.associated_lamps:
+        for assoc_lamp in lamp_object.associated_lamps:
+            retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
+            if lamp_object.is_group():
+                if assoc_lamp.associated_lamps:
+                    for nested_lamp in assoc_lamp.associated_lamps:
+                        if nested_lamp.device_name != lamp_object.device_name:
+                            retrieve_actual_level(mqtt_client, data_object, nested_lamp)      
         
 def retrieve_actual_level(mqtt_client, data_object, lamp_object):
         try:
