@@ -332,13 +332,17 @@ def update_associated_lamps(mqtt_client, data_object, lamp_object):
                             
 def execute_update_associated_lamps(mqtt_client, data_object, lamp_object):
     if lamp_object.associated_lamps:
+        requested_lamps =[]  
         for assoc_lamp in lamp_object.associated_lamps:
-            retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
-            if lamp_object.is_group():
-                if assoc_lamp.associated_lamps:
-                    for nested_lamp in assoc_lamp.associated_lamps:
-                        if nested_lamp.device_name != lamp_object.device_name:
-                            retrieve_actual_level(mqtt_client, data_object, nested_lamp)      
+            if not assoc_lamp.device_name in requested_lamps:
+                retrieve_actual_level(mqtt_client, data_object, assoc_lamp)
+                requested_lamps.append(assoc_lamp.device_name)
+                if lamp_object.is_group():
+                    if assoc_lamp.associated_lamps:
+                        for nested_lamp in assoc_lamp.associated_lamps:
+                            if nested_lamp.device_name != lamp_object.device_name and not nested_lamp.device_name in requested_lamps:
+                                retrieve_actual_level(mqtt_client, data_object, nested_lamp)
+                                requested_lamps.append(assoc_lamp.device_name)      
         
 def retrieve_actual_level(mqtt_client, data_object, lamp_object):
         try:
