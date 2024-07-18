@@ -282,7 +282,7 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
 
         try:
             new_level = int(msg.payload.decode("utf-8"))
-            if new_level == lamp_object.level:
+            if not lamp_object.level_change_needed(new_level):
                 return
             
             lamp_object.level = new_level

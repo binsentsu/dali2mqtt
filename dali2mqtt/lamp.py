@@ -119,6 +119,20 @@ class Lamp:
         else:
             self.__level = 0
             
+    def level_change_needed(self, value):
+        if isinstance(value, int):
+            if value == 0:
+                return True
+            
+            if isinstance(self.min_level, int) and value < self.min_level:
+                value = self.min_level
+            elif isinstance(self.max_level, int) and value > self.max_level:
+                value = self.max_level
+                
+            current_level = self.level
+            return value != current_level
+        return False
+            
 
 
         
