@@ -51,7 +51,11 @@ class Lamp:
             self.min_physical_level = None
             logger.warning("Set min_physical_level to None as %s failed: %s", _min_physical_level, err)
         self.min_level = driver.send(gear.QueryMinLevel(short_address)).value
+        if not isinstance(self.min_level, int):
+            self.min_level = self.min_physical_level if self.min_physical_level else 86
         self.max_level = driver.send(gear.QueryMaxLevel(short_address)).value
+        if not isinstance(self.max_level, int):
+            self.max_level = 254
         self.level = driver.send(gear.QueryActualLevel(short_address)).value
 
     def gen_ha_config(self, mqtt_base_topic):
