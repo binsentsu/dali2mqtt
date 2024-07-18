@@ -100,21 +100,22 @@ class Lamp:
     @level.setter
     def level(self, value):
         """Commit level to ballast."""
-       # if isinstance(value, int) and value != 0:
-      #      if isinstance(self.min_level, int) and value < self.min_level:
-      #          value = self.min_level
-     #       elif value > self.max_level:
-     #           value = self.max_level
+        if isinstance(value, int) and value != 0:
+            if isinstance(self.min_level, int) and value < self.min_level:
+                value = self.min_level
+            elif isinstance(self.max_level, int) and value > self.max_level:
+                value = self.max_level
 
         if isinstance(value, int):
             self.__level = value
+            self.driver.send(gear.DAPC(self.short_address, self.level))
+            logger.debug(
+                "Set lamp <%s> brightness level to %s", self.friendly_name, self.level
+            )
         else:
             self.__level = 0
             
-        self.driver.send(gear.DAPC(self.short_address, self.level))
-        logger.debug(
-            "Set lamp <%s> brightness level to %s", self.friendly_name, self.level
-        )
+
 
         
     def off(self):
