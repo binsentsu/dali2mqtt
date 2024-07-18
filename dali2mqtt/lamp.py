@@ -139,6 +139,7 @@ class Lamp:
     def off(self):
         """Turn off ballast."""
         self.driver.send(gear.Off(self.short_address))
+        self.__level = 0
 
     def __str__(self):
         """Serialize lamp information."""
