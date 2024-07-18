@@ -86,7 +86,11 @@ class Lamp:
 
     def actual_level(self):
         """Retrieve actual level from ballast."""
-        self.__level = self.driver.send(gear.QueryActualLevel(self.short_address)).value
+        local_level = self.driver.send(gear.QueryActualLevel(self.short_address)).value
+        if isinstance(local_level,int):
+            self.__level = local_level
+        else:
+            self.__level = 0
 
     @property
     def level(self):
