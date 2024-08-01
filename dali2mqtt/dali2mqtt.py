@@ -129,7 +129,7 @@ def scan_groups(dali_driver, lamps):
     return groups
 
 
-def initialize_lamps(data_object, client):
+def initialize_lamps(data_object, client:mqtt.Client):
     """Initialize all lamps and groups."""
 
     driver = data_object["driver"]
@@ -191,7 +191,7 @@ def initialize_lamps(data_object, client):
                 ),
             ]
             for topic, payload, retain in mqtt_data:
-                client.publish(topic, payload, retain)
+                client.publish(topic = topic, payload = payload, retain=retain)
 
             logger.info(lamp_object)
             return lamp_object
@@ -228,13 +228,13 @@ def initialize_lamps(data_object, client):
     logger.info("initialize_lamps finished")
 
 
-def on_detect_changes_in_config(mqtt_client):
+def on_detect_changes_in_config(mqtt_client:mqtt.Client):
     """Callback when changes are detected in the configuration file."""
     logger.info("Reconnecting to server")
     mqtt_client.disconnect()
 
 
-def on_message_cmd(mqtt_client, data_object, msg):
+def on_message_cmd(mqtt_client:mqtt.Client, data_object, msg):
     """Callback on MQTT command message."""
     logger.debug("Command on %s: %s", msg.topic, msg.payload)
     light = re.search(
@@ -257,7 +257,7 @@ def on_message_cmd(mqtt_client, data_object, msg):
             logger.error("Lamp %s doesn't exists", light)
 
 
-def on_message_reinitialize_lamps_cmd(mqtt_client, data_object, msg):
+def on_message_reinitialize_lamps_cmd(mqtt_client:mqtt.Client, data_object, msg):
     """Callback on MQTT scan lamps command message."""
     logger.debug("Reinitialize Command on %s", msg.topic)
     initialize_lamps(data_object, mqtt_client)
@@ -270,7 +270,7 @@ def get_lamp_object(data_object, light):
     return data_object["all_lamps"][light]
 
 
-def on_message_brightness_cmd(mqtt_client, data_object, msg):
+def on_message_brightness_cmd(mqtt_client:mqtt.Client, data_object, msg):
     """Callback on MQTT brightness command message."""
     logger.debug("Brightness Command on %s: %s", msg.topic, msg.payload)
     light = re.search(
@@ -292,13 +292,13 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
                 logger.debug("Set light <%s> to OFF", light)
 
             mqtt_client.publish(
-                MQTT_STATE_TOPIC.format(data_object["base_topic"], light),
-                MQTT_PAYLOAD_ON if lamp_object.level != 0 else MQTT_PAYLOAD_OFF,
+                topic = MQTT_STATE_TOPIC.format(data_object["base_topic"], light),
+                payload = MQTT_PAYLOAD_ON if lamp_object.level != 0 else MQTT_PAYLOAD_OFF,
                 retain=False,
             )
             mqtt_client.publish(
-                MQTT_BRIGHTNESS_STATE_TOPIC.format(data_object["base_topic"], light),
-                lamp_object.level,
+                topic = MQTT_BRIGHTNESS_STATE_TOPIC.format(data_object["base_topic"], light),
+                payload = lamp_object.level,
                 retain=True,
             )
             update_associated_lamps(mqtt_client, data_object, lamp_object)
@@ -314,7 +314,7 @@ def on_message_brightness_cmd(mqtt_client, data_object, msg):
         logger.error("Lamp %s doesn't exists", light)
 
 
-def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
+def on_message_brightness_get_cmd(mqtt_client:mqtt.Client, data_object, msg):
     """Callback on MQTT brightness get command message."""
     logger.debug("Brightness Get Command on %s: %s", msg.topic, msg.payload)
     light = re.search(
@@ -328,13 +328,13 @@ def on_message_brightness_get_cmd(mqtt_client, data_object, msg):
     except KeyError:
         logger.error("Lamp %s doesn't exists", light)
         
-def update_associated_lamps(mqtt_client, data_object, lamp_object):
+def update_associated_lamps(mqtt_client:mqtt.Client, data_object, lamp_object):
     if lamp_object.associated_lamps:
         """Give 1 sec to complete the main action before evaluating the associations"""
         time.sleep(1)
         associated_lamp_update_executor.submit(execute_update_associated_lamps, mqtt_client, data_object, lamp_object)
                             
-def execute_update_associated_lamps(mqtt_client, data_object, lamp_object):
+def execute_update_associated_lamps(mqtt_client:mqtt.Client, data_object, lamp_object):
     if lamp_object.associated_lamps:
         requested_lamps =[]  
         for assoc_lamp in lamp_object.associated_lamps:
@@ -348,21 +348,21 @@ def execute_update_associated_lamps(mqtt_client, data_object, lamp_object):
                                 retrieve_actual_level(mqtt_client, data_object, nested_lamp)
                                 requested_lamps.append(nested_lamp.device_name)      
         
-def retrieve_actual_level(mqtt_client, data_object, lamp_object):
+def retrieve_actual_level(mqtt_client:mqtt.Client, data_object, lamp_object):
         try:
             light = lamp_object.device_name
             lamp_object.actual_level()
             logger.debug("Get light <%s> results in %d", light, lamp_object.level)
 
             mqtt_client.publish(
-                MQTT_BRIGHTNESS_STATE_TOPIC.format(data_object["base_topic"], light),
-                lamp_object.level,
+                topic= MQTT_BRIGHTNESS_STATE_TOPIC.format(data_object["base_topic"], light),
+                payload=lamp_object.level,
                 retain=False,
             )
 
             mqtt_client.publish(
-                MQTT_STATE_TOPIC.format(data_object["base_topic"], light),
-                MQTT_PAYLOAD_ON if lamp_object.level != 0 else MQTT_PAYLOAD_OFF,
+                topic = MQTT_STATE_TOPIC.format(data_object["base_topic"], light),
+                payload = MQTT_PAYLOAD_ON if lamp_object.level != 0 else MQTT_PAYLOAD_OFF,
                 retain=False,
             )
 
@@ -376,13 +376,13 @@ def retrieve_actual_level(mqtt_client, data_object, lamp_object):
             )    
 
 
-def on_message(mqtt_client, data_object, msg):  # pylint: disable=W0613
+def on_message(mqtt_client:mqtt.Client, data_object, msg):  # pylint: disable=W0613
     """Default callback on MQTT message."""
     logger.error("Don't publish to %s", msg.topic)
 
 
 def on_connect(
-    client,
+    client:mqtt.Client,
     data_object,
     flags,
     result,
@@ -399,7 +399,7 @@ def on_connect(
         ]
     )
     client.publish(
-        MQTT_DALI2MQTT_STATUS.format(mqtt_base_topic), MQTT_AVAILABLE, retain=True
+        topic=MQTT_DALI2MQTT_STATUS.format(mqtt_base_topic), payload=MQTT_AVAILABLE, retain=True
     )
     initialize_lamps(data_object, client)
 
@@ -414,7 +414,7 @@ def create_mqtt_client(
     devices_names_config,
     ha_prefix,
     log_level,
-):
+) -> mqtt.Client:
     """Create MQTT client object, setup callbacks and connection to server."""
     logger.debug("Connecting to %s:%s", mqtt_server, mqtt_port)
     mqttc = mqtt.Client(
@@ -459,7 +459,7 @@ def create_mqtt_client(
 
 def main(args):
     """Main loop."""
-    mqttc = None
+    mqttc : mqtt.Client = None
     config = Config(args, lambda: on_detect_changes_in_config(mqttc))
 
     if config.log_color:
