@@ -187,7 +187,7 @@ def initialize_lamps(data_object, client:mqtt.Client):
                 (
                     MQTT_STATE_TOPIC.format(mqtt_base_topic, device_name),
                     MQTT_PAYLOAD_ON if lamp_object.level > 0 else MQTT_PAYLOAD_OFF,
-                    False,
+                    True,
                 ),
             ]
             for topic, payload, retain in mqtt_data:
