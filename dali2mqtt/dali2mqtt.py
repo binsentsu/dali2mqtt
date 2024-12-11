@@ -165,7 +165,7 @@ def initialize_lamps(data_object, client:mqtt.Client):
                 (
                     MQTT_BRIGHTNESS_STATE_TOPIC.format(mqtt_base_topic, device_name),
                     lamp_object.level,
-                    False,
+                    True,
                 ),
                 (
                     MQTT_BRIGHTNESS_MAX_LEVEL_TOPIC.format(mqtt_base_topic, device_name),
