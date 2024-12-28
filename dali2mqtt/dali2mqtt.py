@@ -363,7 +363,7 @@ def retrieve_actual_level(mqtt_client:mqtt.Client, data_object, lamp_object):
             mqtt_client.publish(
                 topic = MQTT_STATE_TOPIC.format(data_object["base_topic"], light),
                 payload = MQTT_PAYLOAD_ON if lamp_object.level != 0 else MQTT_PAYLOAD_OFF,
-                retain=False,
+                retain=True,
             )
 
         except ValueError as err:
