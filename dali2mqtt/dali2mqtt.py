@@ -357,7 +357,7 @@ def retrieve_actual_level(mqtt_client:mqtt.Client, data_object, lamp_object):
             mqtt_client.publish(
                 topic= MQTT_BRIGHTNESS_STATE_TOPIC.format(data_object["base_topic"], light),
                 payload=lamp_object.level,
-                retain=False,
+                retain=True,
             )
 
             mqtt_client.publish(
